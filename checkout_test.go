@@ -27,3 +27,26 @@ func TestCheckout_Scan(t *testing.T) {
 		})
 	}
 }
+
+func TestCheckout_GetTotalPrice(t *testing.T) {
+	tests := map[string]struct {
+		c    *Checkout
+		skus []rune
+		want int
+	}{
+		"Checkout A":     {new(Checkout), []rune{'A'}, 50},
+		"Checkout A B":   {new(Checkout), []rune{'A', 'B'}, 80},
+		"Checkout A B C": {new(Checkout), []rune{'A', 'B', 'C'}, 80},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			for _, sku := range tt.skus {
+				tt.c.Scan(sku)
+			}
+
+			if got := tt.c.GetTotalPrice(); got != tt.want {
+				t.Errorf("Incorrect price, wanted %v, got: %v", tt.want, got)
+			}
+		})
+	}
+}
