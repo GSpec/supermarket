@@ -1,6 +1,7 @@
 package supermarket
 
 import (
+	"fmt"
 	"os"
 	"testing"
 )
@@ -23,20 +24,25 @@ func TestCheckout_Scan(t *testing.T) {
 		sku rune
 	}
 	tests := map[string]struct {
-		c       *Checkout
 		args    args
-		wantErr bool
+		wantErr string
 	}{
-		"Scan A": {NewCheckout(testStore), args{'A'}, false},
-		"Scan B": {NewCheckout(testStore), args{'B'}, false},
-		"Scan E": {NewCheckout(testStore), args{'E'}, true},
+		"Scan A": {args{'A'}, ""},
+		"Scan B": {args{'B'}, ""},
+		"Scan E": {args{'E'}, fmt.Sprintf(errorSkuNotFound, 'E')},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			err := tt.c.Scan(tt.args.sku)
+			c := NewCheckout(testStore)
+			err := c.Scan(tt.args.sku)
 
-			if (err != nil) != tt.wantErr {
+			switch {
+			case err != nil && tt.wantErr == "":
 				t.Errorf("Unwanted error returned: %v", err)
+			case err != nil && tt.wantErr != err.Error():
+				t.Errorf("Wanted error: %v, got: %v", tt.wantErr, err)
+			case err == nil && tt.wantErr != "":
+				t.Errorf("Wanted error: %v, got: %v", tt.wantErr, err)
 			}
 		})
 	}
@@ -44,21 +50,21 @@ func TestCheckout_Scan(t *testing.T) {
 
 func TestCheckout_GetTotalPrice(t *testing.T) {
 	tests := map[string]struct {
-		c    *Checkout
 		skus []rune
 		want int
 	}{
-		"Checkout A":     {NewCheckout(testStore), []rune{'A'}, 50},
-		"Checkout A B":   {NewCheckout(testStore), []rune{'A', 'B'}, 80},
-		"Checkout A B E": {NewCheckout(testStore), []rune{'A', 'B', 'E'}, 80},
+		"Checkout A":     {[]rune{'A'}, 50},
+		"Checkout A B":   {[]rune{'A', 'B'}, 80},
+		"Checkout A B E": {[]rune{'A', 'B', 'E'}, 80},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
+			c := NewCheckout(testStore)
 			for _, sku := range tt.skus {
-				tt.c.Scan(sku)
+				c.Scan(sku)
 			}
 
-			if got := tt.c.GetTotalPrice(); got != tt.want {
+			if got := c.GetTotalPrice(); got != tt.want {
 				t.Errorf("Incorrect price, wanted %v, got: %v", tt.want, got)
 			}
 		})

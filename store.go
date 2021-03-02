@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+const errorSkuNotFound = "Could not find SKU: %c"
+
 type Store struct {
 	stock map[rune]Item
 }
@@ -18,5 +20,5 @@ func (s Store) ChooseItem(sku rune) (*Item, error) {
 		return &item, nil
 	}
 
-	return nil, errors.New(fmt.Sprintf("Could not find SKU: %v", sku))
+	return nil, errors.New(fmt.Sprintf("Could not find SKU: %c", sku))
 }
