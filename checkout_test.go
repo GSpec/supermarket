@@ -1,8 +1,22 @@
 package supermarket
 
 import (
+	"os"
 	"testing"
 )
+
+var testStore *Store
+
+func TestMain(m *testing.M) {
+	testStore = new(Store)
+	testStore.LoadStock(map[rune]Item{
+		'A': {50},
+		'B': {30},
+		'C': {20},
+		'D': {15},
+	})
+	os.Exit(m.Run())
+}
 
 func TestCheckout_Scan(t *testing.T) {
 	type args struct {
@@ -13,9 +27,9 @@ func TestCheckout_Scan(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		"Scan A": {new(Checkout), args{'A'}, false},
-		"Scan B": {new(Checkout), args{'B'}, false},
-		"Scan C": {new(Checkout), args{'C'}, true},
+		"Scan A": {NewCheckout(testStore), args{'A'}, false},
+		"Scan B": {NewCheckout(testStore), args{'B'}, false},
+		"Scan E": {NewCheckout(testStore), args{'E'}, true},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -34,9 +48,9 @@ func TestCheckout_GetTotalPrice(t *testing.T) {
 		skus []rune
 		want int
 	}{
-		"Checkout A":     {new(Checkout), []rune{'A'}, 50},
-		"Checkout A B":   {new(Checkout), []rune{'A', 'B'}, 80},
-		"Checkout A B C": {new(Checkout), []rune{'A', 'B', 'C'}, 80},
+		"Checkout A":     {NewCheckout(testStore), []rune{'A'}, 50},
+		"Checkout A B":   {NewCheckout(testStore), []rune{'A', 'B'}, 80},
+		"Checkout A B E": {NewCheckout(testStore), []rune{'A', 'B', 'E'}, 80},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {

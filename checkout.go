@@ -1,27 +1,25 @@
 package supermarket
 
-import (
-	"errors"
-	"fmt"
-)
-
 // Checkout provides functionality for scanning SKUs and calculating the total price.
 type Checkout struct {
+	store *Store
 	items []Item
+}
+
+func NewCheckout(s *Store) *Checkout {
+	return &Checkout{store: s}
 }
 
 // Scan adds an item to the checkout.
 func (c *Checkout) Scan(sku rune) error {
-	switch sku {
-	case 'A':
-		c.items = append(c.items, Item{sku, 50})
-		return nil
-	case 'B':
-		c.items = append(c.items, Item{sku, 30})
-		return nil
-	default:
-		return errors.New(fmt.Sprintf("Could not find SKU: %v", sku))
+	item, err := c.store.ChooseItem(sku)
+
+	if err != nil {
+		return err
 	}
+
+	c.items = append(c.items, *item)
+	return nil
 }
 
 // GetTotalPrice calculates the price of the items currently in the checkout.
