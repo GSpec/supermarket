@@ -2,8 +2,14 @@ package supermarket
 
 // Checkout provides functionality for scanning SKUs and calculating the total price.
 type Checkout struct {
-	store *Store
-	items []Item
+	store     *Store
+	lineItems []LineItem
+}
+
+// LineItem is an item in a Checkout
+type LineItem struct {
+	sku  rune
+	item Item
 }
 
 func NewCheckout(s *Store) *Checkout {
@@ -18,15 +24,30 @@ func (c *Checkout) Scan(sku rune) error {
 		return err
 	}
 
-	c.items = append(c.items, *item)
+	c.lineItems = append(c.lineItems, LineItem{sku, *item})
 	return nil
 }
 
 // GetTotalPrice calculates the price of the items currently in the checkout.
 func (c Checkout) GetTotalPrice() int {
 	t := 0
-	for _, item := range c.items {
-		t += item.UnitPrice
+	for _, li := range c.lineItems {
+		t += li.item.UnitPrice
+	}
+
+	for _, discounter := range c.store.offers {
+		t -= discounter.Discount(c)
+	}
+
+	return t
+}
+
+func (c Checkout) getCountOf(sku rune) int {
+	t := 0
+	for _, li := range c.lineItems {
+		if li.sku == sku {
+			t++
+		}
 	}
 
 	return t

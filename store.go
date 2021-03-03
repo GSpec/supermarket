@@ -11,7 +11,8 @@ const errorInvalidPrice = "Could not load item with UnitPrice: %v"
 const errorSkuNotFound = "Could not find SKU: %c"
 
 type Store struct {
-	stock map[rune]Item
+	stock  map[rune]Item
+	offers []Discounter
 }
 
 func (s *Store) LoadStock(stock map[rune]Item) error {
@@ -24,6 +25,11 @@ func (s *Store) LoadStock(stock map[rune]Item) error {
 		}
 	}
 	s.stock = stock
+	return nil
+}
+
+func (s *Store) LoadOffers(offers []Discounter) error {
+	s.offers = offers
 	return nil
 }
 

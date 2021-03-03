@@ -16,6 +16,9 @@ func TestMain(m *testing.M) {
 		'C': {20},
 		'D': {15},
 	})
+	testStore.LoadOffers([]Discounter{
+		Multibuy{sku: 'A', quantity: 3, discountAmount: 20},
+	})
 	os.Exit(m.Run())
 }
 
@@ -54,6 +57,7 @@ func TestCheckout_GetTotalPrice(t *testing.T) {
 		"Checkout A B":   {[]rune{'A', 'B'}, 80},
 		"Checkout A B E": {[]rune{'A', 'B', 'E'}, 80},
 		"Checkout None":  {[]rune{}, 0},
+		"Checkout A A A": {[]rune{'A', 'A', 'A'}, 130},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {

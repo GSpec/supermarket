@@ -22,14 +22,36 @@ func TestStore_LoadStock(t *testing.T) {
 			s := new(Store)
 			err := s.LoadStock(tt.stock)
 
-			switch {
-			case err != nil && tt.wantErr == "":
-				t.Errorf("Unwanted error returned: %v", err)
-			case err != nil && tt.wantErr != err.Error():
-				t.Errorf("Wanted error: %v, got: %v", tt.wantErr, err)
-			case err == nil && tt.wantErr != "":
-				t.Errorf("Wanted error: %v, got: %v", tt.wantErr, err)
-			}
+			assertErrorCorrect(t, tt.wantErr, err)
 		})
+	}
+}
+
+func TestStore_LoadOffers(t *testing.T) {
+	tests := map[string]struct {
+		offers  []Discounter
+		wantErr string
+	}{
+		"No Offers":      {[]Discounter{}, ""},
+		"Multibuy Offer": {[]Discounter{Multibuy{'A', 2, 10}}, ""},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			s := new(Store)
+			err := s.LoadOffers(tt.offers)
+
+			assertErrorCorrect(t, tt.wantErr, err)
+		})
+	}
+}
+
+func assertErrorCorrect(t *testing.T, wantErr string, err error) {
+	switch {
+	case err != nil && wantErr == "":
+		t.Errorf("Unwanted error returned: %v", err)
+	case err != nil && wantErr != err.Error():
+		t.Errorf("Wanted error: %v, got: %v", wantErr, err)
+	case err == nil && wantErr != "":
+		t.Errorf("Wanted error: %v, got: %v", wantErr, err)
 	}
 }
