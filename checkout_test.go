@@ -20,21 +20,18 @@ func TestMain(m *testing.M) {
 }
 
 func TestCheckout_Scan(t *testing.T) {
-	type args struct {
-		sku rune
-	}
 	tests := map[string]struct {
-		args    args
+		sku     rune
 		wantErr string
 	}{
-		"Scan A": {args{'A'}, ""},
-		"Scan B": {args{'B'}, ""},
-		"Scan E": {args{'E'}, fmt.Sprintf(errorSkuNotFound, 'E')},
+		"Scan A": {'A', ""},
+		"Scan B": {'B', ""},
+		"Scan E": {'E', fmt.Sprintf(errorSkuNotFound, 'E')},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			c := NewCheckout(testStore)
-			err := c.Scan(tt.args.sku)
+			err := c.Scan(tt.sku)
 
 			switch {
 			case err != nil && tt.wantErr == "":
@@ -56,6 +53,7 @@ func TestCheckout_GetTotalPrice(t *testing.T) {
 		"Checkout A":     {[]rune{'A'}, 50},
 		"Checkout A B":   {[]rune{'A', 'B'}, 80},
 		"Checkout A B E": {[]rune{'A', 'B', 'E'}, 80},
+		"Checkout None":  {[]rune{}, 0},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
