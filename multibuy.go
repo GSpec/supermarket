@@ -1,5 +1,13 @@
 package supermarket
 
+import (
+	"errors"
+	"fmt"
+)
+
+const errorInvalidMultibuyQuantity = "Invalid Multibuy Quantity: %v"
+const errorInvalidMultibuyDiscount = "Invalid Multibuy Discount: %v"
+
 // Multibuy offer to get a discount when multiple items are bought.
 type Multibuy struct {
 	sku            rune
@@ -7,9 +15,19 @@ type Multibuy struct {
 	discountAmount int
 }
 
+func NewMultibuy(sku rune, quantity int, discountAmount int) (*Multibuy, error) {
+	switch {
+	case quantity < 2:
+		return nil, errors.New(fmt.Sprintf(errorInvalidMultibuyQuantity, quantity))
+	case discountAmount <= 0:
+		return nil, errors.New(fmt.Sprintf(errorInvalidMultibuyDiscount, discountAmount))
+	}
+	return &Multibuy{sku, quantity, discountAmount}, nil
+}
+
 func (o Multibuy) Discount(c Checkout) int {
 	skuCount := c.getCountOf(o.sku)
-	return o.calculateDiscount('A', skuCount)
+	return o.calculateDiscount(o.sku, skuCount)
 }
 
 func (o Multibuy) calculateDiscount(sku rune, quantity int) int {
@@ -17,5 +35,6 @@ func (o Multibuy) calculateDiscount(sku rune, quantity int) int {
 		return 0
 	}
 
-	return o.discountAmount
+	offerApplyCount := quantity / o.quantity
+	return o.discountAmount * offerApplyCount
 }

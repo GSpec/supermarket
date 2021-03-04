@@ -11,7 +11,7 @@ func TestStore_LoadStock(t *testing.T) {
 		wantErr string
 	}{
 		"Valid Stock A":               {map[rune]Item{'A': {1}}, ""},
-		"Valid Stock Z":               {map[rune]Item{'Z': {2147483647}}, ""},
+		"Valid Stock Z":               {map[rune]Item{'Z': {9223372036854775807}}, ""},
 		"Invalid Stock SKU Lowercase": {map[rune]Item{'a': {1}}, fmt.Sprintf(errorInvalidSku, 'a')},
 		"Invalid Stock SKU Symbol":    {map[rune]Item{'%': {1}}, fmt.Sprintf(errorInvalidSku, '%')},
 		"Invalid Stock Price 0":       {map[rune]Item{'Z': {0}}, fmt.Sprintf(errorInvalidPrice, 0)},
