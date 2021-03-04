@@ -6,17 +6,18 @@ type Checkout struct {
 	lineItems []LineItem
 }
 
-// LineItem is an item in a Checkout
+// LineItem is an item in a Checkout.
 type LineItem struct {
 	sku  rune
 	item Item
 }
 
+// NewCheckout creates an instance of a Checkout using the Store provided.
 func NewCheckout(s *Store) *Checkout {
 	return &Checkout{store: s}
 }
 
-// Scan adds an item to the checkout.
+// Scan adds an item to the checkout, or returns an error if not found.
 func (c *Checkout) Scan(sku rune) error {
 	item, err := c.store.ChooseItem(sku)
 

@@ -15,6 +15,8 @@ type Multibuy struct {
 	discountAmount int
 }
 
+// NewMultibuy creates a Multibuy offer for the given sku, quantity and discountAmount,
+// or returns an error if the quantity or discountAmount is invalid.
 func NewMultibuy(sku rune, quantity int, discountAmount int) (*Multibuy, error) {
 	switch {
 	case quantity < 2:
@@ -25,6 +27,7 @@ func NewMultibuy(sku rune, quantity int, discountAmount int) (*Multibuy, error) 
 	return &Multibuy{sku, quantity, discountAmount}, nil
 }
 
+// Discount calculates a Multibuy discount if it can be applied to the given Checkout.
 func (o Multibuy) Discount(c Checkout) int {
 	skuCount := c.getCountOf(o.sku)
 	return o.calculateDiscount(o.sku, skuCount)
